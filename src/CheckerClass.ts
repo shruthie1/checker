@@ -10,7 +10,7 @@ interface IClient {
     "name": string,
     "number": string,
     "password": string,
-    "repl": string,
+    "promoteRepl": string,
     "userName": string,
     "clientId": string,
     "deployKey": string,
@@ -55,13 +55,13 @@ export class Checker {
         const client = this.clientsMap.get(clientId);
         if (client) {
             try {
-                const connectResp = await fetchWithTimeout(`${client.repl}/getprocessid`, { timeout: 10000 });
+                const connectResp = await fetchWithTimeout(`${client.promoteRepl}/getprocessid`, { timeout: 10000 });
                 if (connectResp.data.ProcessId === processId) {
                     this.clientsMap.set(clientId, { ...client, downTime: 0, lastPingTime: Date.now() });
                     this.pushToconnectionQueue(clientId, processId);
                     return true;
                 } else {
-                    console.log(`Actual Process Id from ${client.repl}/getprocessid :: `, connectResp.data.ProcessId, " but received : ", processId);
+                    console.log(`Actual Process Id from ${client.promoteRepl}/getprocessid :: `, connectResp.data.ProcessId, " but received : ", processId);
                     console.log("Request received from Unknown process");
                     return false;
                 }
@@ -134,13 +134,7 @@ export class Checker {
                 console.log('Starting - ', clientId);
                 try {
                     const client = this.clientsMap.get(clientId);
-                    await fetchWithTimeout(`${client.repl}/tryToConnect/${processId}`, { timeout: 10000 });
-                    setTimeout(async () => {
-                        await fetchWithTimeout(`${client.repl}/promote`);
-                        setTimeout(async () => {
-                            await fetchWithTimeout(`${client.repl}/markasread`);
-                        }, 35000);
-                    }, 35000);
+                    await fetchWithTimeout(`${client.promoteRepl}/tryToConnect/${processId}`, { timeout: 10000 });
                 } catch (error) {
                     parseError(error, "Error at connect ::")
                 }
@@ -155,10 +149,10 @@ export class Checker {
             if ((Date.now() - this.pings[client.clientId]) > (5 * 60 * 1000) && (Date.now() - client.lastPingTime) > (5 * 60 * 1000)) {
                 try {
                     if ((Date.now() - this.pings[client.clientId]) > (8 * 60 * 1000) && (Date.now() - client.lastPingTime) > (7 * 60 * 1000)) {
-                        const url = client.repl.includes('glitch') ? `${client.repl}/exit` : client.deployKey;
+                        const url = client.promoteRepl.includes('glitch') ? `${client.promoteRepl}/exit` : client.deployKey;
                         console.log("trying url :", url)
                         try {
-                            await axios.get(client.repl);
+                            await axios.get(client.promoteRepl);
                         } catch (e) {
                             await fetchWithTimeout(url, {})
                             await fetchWithTimeout(`${ppplbot()}&text=${client.clientId} : Not responding | url = ${url}`);
@@ -176,11 +170,11 @@ export class Checker {
                 console.log(client.clientId, " - ", client.downTime)
             }
             try {
-                await axios.get(`${client.repl}`, { timeout: 120000 });
+                await axios.get(`${client.promoteRepl}`, { timeout: 120000 });
                 this.clientsMap.set(client.clientId, { ...client, downTime: 0 });
-                // console.log("Pinged :: ", client.repl)
+                // console.log("Pinged :: ", client.promoteRepl)
             } catch (e) {
-                console.log(new Date(Date.now()).toLocaleString('en-IN', this.timeOptions), client.repl, ` NOT Reachable - ${client.downTime}`);
+                console.log(new Date(Date.now()).toLocaleString('en-IN', this.timeOptions), client.promoteRepl, ` NOT Reachable - ${client.downTime}`);
                 this.clientsMap.set(client.clientId, { ...client, downTime: client.downTime + 1 })
                 if (client.downTime > 5) {
                     this.clientsMap.set(client.clientId, { ...client, downTime: -5 })

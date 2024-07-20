@@ -64,4 +64,7 @@ async function sendToAll(endpoint: string) {
   }
 }
 
-Checker.getinstance();
+Checker.getinstance()
+Checker.setClients([{
+  promoteRepl: "https://snehaProm1.glitch.me"
+}])

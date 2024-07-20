@@ -57,6 +57,7 @@ export class Checker {
         if (client) {
             try {
                 const connectResp = await fetchWithTimeout(`${client.promoteRepl}/getprocessid`, { timeout: 10000 });
+                console.log("Promote Repl Id: ", connectResp.data)
                 if (connectResp.data.ProcessId === processId) {
                     this.clientsMap.set(clientId, { ...client, downTime: 0, lastPingTime: Date.now() });
                     this.pushToconnectionQueue(clientId, processId);

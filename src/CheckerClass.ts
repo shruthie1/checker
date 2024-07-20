@@ -104,6 +104,7 @@ export class Checker {
     }
 
     async pushToconnectionQueue(clientId: string, processId: string) {
+        console.log("Pushhing to Connection Queue")
         const existingIndex = this.connetionQueue.findIndex(entry => entry.clientId === clientId);
         if (existingIndex !== -1) {
             this.connetionQueue[existingIndex].processId = processId;
@@ -116,6 +117,7 @@ export class Checker {
     main() {
         setInterval(async () => {
             this.count = this.count + 1
+            this.connectToNewClients();
             if (this.count % 4 == 1) {
                 console.log(`-------------------------------------------------------------`)
                 await this.checkPings()

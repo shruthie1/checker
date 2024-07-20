@@ -35,7 +35,8 @@ app.get('/exitPrimary', (req, res, next) => {
 
 app.get('/tgclientoff/:processId', (req, res, next) => {
   const clientId = <string>req.query.clientId
-  Checker.getinstance().getClientOff(clientId, req.params.processId)
+  Checker.getinstance().getClientOff(clientId, req.params.processId);
+  res.send("Ok")
 })
 
 app.get('/exitSecondary', (req, res, next) => {

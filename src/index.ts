@@ -39,6 +39,12 @@ app.get('/tgclientoff/:processId', (req, res, next) => {
   res.send("Ok")
 })
 
+app.get('/receive', (req, res, next) => {
+  const clientId = <string>req.query.clientId
+  Checker.getinstance().receivePing(clientId);
+  res.send("Ok")
+})
+
 app.get('/exitSecondary', (req, res, next) => {
   res.send(`exitting Secondary`);
   next()

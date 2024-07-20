@@ -52,6 +52,7 @@ export class Checker {
     }
 
     async getClientOff(clientId: string, processId: string): Promise<boolean> {
+        console.log("ClientId: ", clientId, "ProcessId :", processId)
         const client = this.clientsMap.get(clientId);
         if (client) {
             try {

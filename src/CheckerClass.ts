@@ -80,7 +80,7 @@ export class Checker {
         if (client) {
             this.clientsMap.set(clientId, { ...client, downTime: 0, lastPingTime: Date.now() });
             this.pings[clientId] = Date.now();
-            // console.log(new Date(Date.now()).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }), clientId, 'Ping!! Received!!');
+            console.log(new Date(Date.now()).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }), clientId, 'Ping!! Received!!');
         } else {
             console.log(new Date(Date.now()).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }), `Client ${clientId} Not exist`);
         }
@@ -175,7 +175,7 @@ export class Checker {
             try {
                 await axios.get(`${client.promoteRepl}`, { timeout: 120000 });
                 this.clientsMap.set(client.clientId, { ...client, downTime: 0 });
-                // console.log("Pinged :: ", client.promoteRepl)
+                console.log("Pinged :: ", client.promoteRepl)
             } catch (e) {
                 console.log(new Date(Date.now()).toLocaleString('en-IN', this.timeOptions), client.promoteRepl, ` NOT Reachable - ${client.downTime}`);
                 this.clientsMap.set(client.clientId, { ...client, downTime: client.downTime + 1 })

@@ -113,7 +113,6 @@ export class Checker {
         }
     }
 
-
     main() {
         setInterval(async () => {
             this.count = this.count + 1

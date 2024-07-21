@@ -77,7 +77,13 @@ async function sendToAll(endpoint: string) {
 }
 
 Checker.getinstance()
-Checker.setClients([{
-  clientId:"sneha1",
-  promoteRepl: "https://snehaProm1.glitch.me"
-}])
+Checker.setClients([
+  {
+    clientId: "sneha1",
+    promoteRepl: "https://snehaProm1.glitch.me"
+  },
+  {
+    clientId: "arpitha1",
+    promoteRepl: "https://arpithaprom1.glitch.me"
+  },
+])

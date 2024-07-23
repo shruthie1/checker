@@ -1,6 +1,6 @@
 import express from 'express';
 import { fetchWithTimeout } from './fetchWithTimeout';
-import { sleep } from './utils';
+import { parseError, sleep } from './utils';
 import { Checker } from './CheckerClass';
 
 const app = express();
@@ -44,6 +44,23 @@ app.get('/receive', (req, res, next) => {
   Checker.getinstance().receivePing(clientId);
   res.send("Ok")
 })
+
+app.get('/forward*', async (req, res) => {
+  let targetHost = <string>process.env.tgcms;
+  if (req.query.host) {
+    targetHost = <string>req.query.host;
+  }
+  try {
+    console.log(req.url);
+    const finalUrl = `${targetHost}${req.url.replace('/forward', '')}`
+    console.log("final:", finalUrl)
+    const response = await fetchWithTimeout(finalUrl)
+    res.status(response?.status).send(response?.data);
+  } catch (error) {
+    console.log(parseError(error))
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 app.get('/exitSecondary', (req, res, next) => {
   res.send(`exitting Secondary`);

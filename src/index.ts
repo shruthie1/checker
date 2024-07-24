@@ -125,6 +125,10 @@ Checker.setClients([
   {
     clientId: "divya2",
     promoteRepl: "https://divyaprom2.glitch.me"
+  },
+  {
+    clientId: "meghana2",
+    promoteRepl: "https://meghanaprom1.glitch.me"
   }
   
 ])

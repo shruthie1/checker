@@ -130,5 +130,4 @@ Checker.setClients([
     clientId: "meghana1",
     promoteRepl: "https://meghanaprom1.glitch.me"
   }
-  
 ])

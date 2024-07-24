@@ -118,4 +118,8 @@ Checker.setClients([
     clientId: "keerthi2",
     promoteRepl: "https://keerthiprom2.glitch.me"
   },
+  {
+    clientId: "arpitha2",
+    promoteRepl: "https://arpithaprom2.glitch.me"
+  }
 ])

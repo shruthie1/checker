@@ -23,7 +23,7 @@ interface IClient {
 }
 
 export class Checker {
-    static instance = undefined;
+    static instance: Checker = undefined;
     clientsMap: Map<string, IClient> = new Map();
     pings = {};
     connetionQueue = [];
@@ -49,6 +49,11 @@ export class Checker {
         for (const client of clients) {
             this.instance.clientsMap.set(client.clientId, client)
         }
+    }
+
+    static async getClients() {
+        Checker.getinstance();
+        return this.instance.clientsMap.values()
     }
 
     async getClientOff(clientId: string, processId: string): Promise<boolean> {

@@ -83,10 +83,9 @@ app.listen(port, () => {
 
 
 async function sendToAll(endpoint: string) {
-  const result = await fetchWithTimeout(`https://uptimechecker2.onrender.com/maskedcls`);
-  const clients = result?.data;
+  const clients = await Checker.getClients();
   for (const client of clients) {
-    const url = `${client.repl}/${endpoint}`
+    const url = `${client.promoteRepl}/${endpoint}`
     console.log("Trying : ", url)
     await fetchWithTimeout(url);
     await sleep(500)

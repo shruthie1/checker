@@ -162,10 +162,10 @@ Checker.setClients([
   //   clientId: "keerthi1",
   //   promoteRepl: "https://sowmyaprom2.glitch.me"
   // },
-  // {
-  //   clientId: "meghana2",
-  //   promoteRepl: "https://sowmyaprom1.glitch.me"
-  // },
+  {
+    clientId: "meghana2",
+    promoteRepl: "https://meghanaprom2.glitch.me"
+  },
   // {
   //   clientId: "ramya1",
   //   promoteRepl: "https://nidhiprom2.glitch.me"

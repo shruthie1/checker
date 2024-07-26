@@ -153,5 +153,25 @@ Checker.setClients([
   {
     clientId: "sneha2",
     promoteRepl: "https://snehaprom2.glitch.me"
-  }
+  },
+  {
+    clientId: "shruthi1",
+    promoteRepl: "https://shruthiprom1.glitch.me"
+  },
+  // {
+  //   clientId: "keerthi1",
+  //   promoteRepl: "https://sowmyaprom2.glitch.me"
+  // },
+  // {
+  //   clientId: "meghana2",
+  //   promoteRepl: "https://sowmyaprom1.glitch.me"
+  // },
+  // {
+  //   clientId: "ramya1",
+  //   promoteRepl: "https://nidhiprom2.glitch.me"
+  // },
+  // {
+  //   clientId: "kavya1",
+  //   promoteRepl: "https://snehaprom2.glitch.me"
+  // }
 ])

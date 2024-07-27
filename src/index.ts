@@ -170,8 +170,8 @@ Checker.setClients([
     clientId: "ramya1",
     promoteRepl: "https://ramyaprom1.glitch.me"
   },
-  // {
-  //   clientId: "kavya1",
-  //   promoteRepl: "https://snehaprom2.glitch.me"
-  // }
+  {
+    clientId: "kavya1",
+    promoteRepl: "https://kavyaprom1.glitch.me"
+  }
 ])

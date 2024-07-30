@@ -22,7 +22,7 @@ app.get('/exitPrimary', (req, res, next) => {
   res.send(`exitting Primary`);
   next()
 }, async (req, res) => {
-  const result = await fetchWithTimeout(`https://uptimechecker2.onrender.com/maskedcls`);
+  const result = await fetchWithTimeout(`https://uptimechecker2.glitch.me/maskedcls`);
   const clients = result?.data;
   for (const client of clients) {
     if (client.clientId.toLowerCase().includes('1')) {
@@ -66,7 +66,7 @@ app.get('/exitSecondary', (req, res, next) => {
   res.send(`exitting Secondary`);
   next()
 }, async (req, res) => {
-  const result = await fetchWithTimeout(`https://uptimechecker2.onrender.com/maskedcls`);
+  const result = await fetchWithTimeout(`https://uptimechecker2.glitch.me/maskedcls`);
   const clients = result?.data;
   for (const client of clients) {
     if (client.clientId.toLowerCase().includes('2')) {
@@ -92,86 +92,9 @@ async function sendToAll(endpoint: string) {
   }
 }
 
-Checker.getinstance()
-Checker.setClients([
-  {
-    clientId: "sneha1",
-    promoteRepl: "https://snehaProm1.glitch.me"
-  },
-  {
-    clientId: "arpitha1",
-    promoteRepl: "https://arpithaprom1.glitch.me"
-  },
-  {
-    clientId: "nidhi1",
-    promoteRepl: "https://nidhiprom1.glitch.me"
-  },
-  {
-    clientId: "divya1",
-    promoteRepl: "https://divyaprom1.glitch.me"
-  },
-  {
-    clientId: "ramya2",
-    promoteRepl: "https://ramyaprom2.glitch.me"
-  },
-  {
-    clientId: "keerthi2",
-    promoteRepl: "https://keerthiprom2.glitch.me"
-  },
-  {
-    clientId: "arpitha2",
-    promoteRepl: "https://arpithaprom2.glitch.me"
-  },
-  {
-    clientId: "divya2",
-    promoteRepl: "https://divyaprom2.glitch.me"
-  },
-  {
-    clientId: "meghana1",
-    promoteRepl: "https://meghanaprom1.glitch.me"
-  },
-  {
-    clientId: "kavya2",
-    promoteRepl: "https://kavyaprom2.glitch.me"
-  },
-  {
-    clientId: "shruthi2",
-    promoteRepl: "https://shruthiprom2.glitch.me"
-  },
-  {
-    clientId: "sowmya2",
-    promoteRepl: "https://sowmyaprom2.glitch.me"
-  },
-  {
-    clientId: "sowmya1",
-    promoteRepl: "https://sowmyaprom1.glitch.me"
-  },
-  {
-    clientId: "nidhi2",
-    promoteRepl: "https://nidhiprom2.glitch.me"
-  },
-  {
-    clientId: "sneha2",
-    promoteRepl: "https://snehaprom2.glitch.me"
-  },
-  {
-    clientId: "shruthi1",
-    promoteRepl: "https://shruthiprom1.glitch.me"
-  },
-  {
-    clientId: "keerthi1",
-    promoteRepl: "https://keerthiprom1.glitch.me"
-  },
-  {
-    clientId: "meghana2",
-    promoteRepl: "https://meghanaprom2.glitch.me"
-  },
-  {
-    clientId: "ramya1",
-    promoteRepl: "https://ramyaprom1.glitch.me"
-  },
-  {
-    clientId: "kavya1",
-    promoteRepl: "https://kavyaprom1.glitch.me"
-  }
-])
+Checker.getinstance();
+async function setClients() {
+  const result = await fetchWithTimeout(`https://uptimechecker2.glitch.me/maskedcls`);
+  await Checker.setClients(result.data)
+}
+setClients()

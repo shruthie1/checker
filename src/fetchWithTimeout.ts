@@ -1,6 +1,6 @@
 import axios, { AddressFamily, AxiosRequestConfig } from "axios";
 import { parseError } from "./parseError";
-const ppplbot = `https://api.telegram.org/bot6735591051:AAELwIkSHegcBIVv5pf484Pn09WNQj1Nl54/sendMessage?chat_id=${process.env.updatesChannel}`;
+import { ppplbot } from "./utils";
 
 export async function fetchWithTimeout(resource: string, options: AxiosRequestConfig = {}, sendErr: boolean = true, maxRetries: number = 1) {
     options.timeout = options.timeout || 50000;
@@ -52,7 +52,7 @@ export async function fetchWithTimeout(resource: string, options: AxiosRequestCo
                 } else {
                     console.log(`All ${maxRetries + 1} retries failed for ${resource}`);
                     if (sendErr) {
-                        axios.get(`${ppplbot}&text=${encodeURIComponent(`HELPER :: All ${maxRetries + 1} retries failed for ${resource}\n${errorDetails.message}`)}`)
+                        axios.get(`${ppplbot()}&text=${encodeURIComponent(`HELPER :: All ${maxRetries + 1} retries failed for ${resource}\n${errorDetails.message}`)}`)
                     }
                     return undefined;
                 }

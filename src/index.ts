@@ -76,6 +76,24 @@ app.get('/exitSecondary', (req, res, next) => {
   }
 });
 
+app.get('/promoteconnect/:num', async (req, res, next) => {
+  res.send('Hello World!');
+  next();
+}, async (req, res) => {
+  try {
+    const clientId = req.query.clientId;
+    const processId = req.params.num;
+    try {
+      await fetchWithTimeout(`https://${clientId}.glitch.me/tryToConnect/${processId}`, { timeout: 10000 });
+    } catch (error) {
+      console.log("Some Error: ", error)
+    }
+
+  } catch (error) {
+    console.log("Some Error: ", error);
+  }
+});
+
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

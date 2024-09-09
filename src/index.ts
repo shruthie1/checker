@@ -77,20 +77,20 @@ app.get('/exitSecondary', (req, res, next) => {
 });
 
 app.get('/promoteconnect/:num', async (req, res, next) => {
-  res.send('Hello World!');
-  next();
-}, async (req, res) => {
   try {
     const clientId = req.query.clientId;
     const processId = req.params.num;
-    try {
+    const connectResp = await fetchWithTimeout(`https://${clientId}.glitch.me/getprocessid`, { timeout: 10000 });
+    if (connectResp.data.ProcessId === processId) {
       await fetchWithTimeout(`https://${clientId}.glitch.me/tryToConnect/${processId}`, { timeout: 10000 });
-    } catch (error) {
-      console.log("Some Error: ", error)
+      return true;
+    } else {
+      console.log(`Actual Process Id from https://${clientId}.glitch.me/getprocessid :: `, connectResp.data.ProcessId, " but received : ", processId);
+      console.log("Request received from Unknown process");
+      return false;
     }
-
   } catch (error) {
-    console.log("Some Error: ", error);
+    parseError(error, "Some Error here:")
   }
 });
 

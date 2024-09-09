@@ -83,14 +83,15 @@ app.get('/promoteconnect/:num', async (req, res, next) => {
     const connectResp = await fetchWithTimeout(`https://${clientId}.glitch.me/getprocessid`, { timeout: 10000 });
     if (connectResp.data.ProcessId === processId) {
       await fetchWithTimeout(`https://${clientId}.glitch.me/tryToConnect/${processId}`, { timeout: 10000 });
-      return true;
+      res.send(true);
     } else {
       console.log(`Actual Process Id from https://${clientId}.glitch.me/getprocessid :: `, connectResp.data.ProcessId, " but received : ", processId);
       console.log("Request received from Unknown process");
-      return false;
+      res.send(false);
     }
   } catch (error) {
     parseError(error, "Some Error here:")
+    res.send(false);
   }
 });
 

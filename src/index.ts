@@ -5,6 +5,11 @@ import { Checker } from './CheckerClass';
 
 const app = express();
 const port = process.env.PORT || 3000;
+async function setEnv() {
+  await getDataAndSetEnvVariables(`https://mytghelper.glitch.me/configuration`);
+}
+
+setEnv();
 
 app.use(express.json());
 app.get('/', (req, res) => {
@@ -111,9 +116,24 @@ async function sendToAll(endpoint: string) {
   }
 }
 
+export async function getDataAndSetEnvVariables(url: string) {
+  try {
+      const response = await fetch(url);
+      const jsonData: any = await response.json();
+      for (const key in jsonData) {
+          console.log("Setting Key", key)
+          process.env[key] = jsonData[key];
+      }
+      console.log('Environment variables set successfully!');
+  } catch (error) {
+      console.error('Error retrieving data or setting environment variables:', error);
+  }
+}
+
 Checker.getinstance();
 async function setClients() {
   const result = await fetchWithTimeout(`https://uptimechecker2.glitch.me/maskedcls`);
   await Checker.setClients(result.data)
 }
 setClients()
+

@@ -12,6 +12,7 @@ async function setEnv() {
 setEnv();
 
 app.use(express.json());
+
 app.get('/', (req, res) => {
   res.send("Hello World");
 })
@@ -43,7 +44,10 @@ app.get('/tgclientoff/:processId', (req, res, next) => {
   Checker.getinstance().getClientOff(clientId, req.params.processId);
   res.send("Ok")
 })
-
+app.get('/exit', (req, res) => {
+  process.exit(1);
+  res.send("Exitting");
+})
 app.get('/receive', (req, res, next) => {
   const clientId = <string>req.query.clientId
   Checker.getinstance().receivePing(clientId);

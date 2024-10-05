@@ -57,21 +57,46 @@ app.get('/receive', (req, res, next) => {
 })
 
 app.get('/forward*', async (req, res) => {
-  let targetHost = <string>process.env.tgcms;
+  let targetHosts = [process.env.tgcms, process.env.uptimeChecker, process.env.tgHelper]; // Default target host from environment variable
+
   if (req.query.host) {
-    targetHost = <string>req.query.host;
+    targetHosts = (<string>req.query.host).split(','); // Expect multiple hosts to be provided as a comma-separated list
   }
+
   try {
     console.log(req.url);
-    const finalUrl = `${targetHost}${req.url.replace('/forward', '')}`
-    console.log("final:", finalUrl)
-    const response = await fetchWithTimeout(finalUrl)
-    res.status(response?.status).send(response?.data);
+    const endpoint = req.url.replace('/forward', ''); // The endpoint part of the URL to append
+    let response = null;
+
+    // Loop through target hosts and attempt to fetch from each until a successful response
+    for (const targetHost of targetHosts) {
+      const finalUrl = `${targetHost}${endpoint}`;
+      console.log("Trying URL:", finalUrl);
+
+      try {
+        response = await fetchWithTimeout(finalUrl);
+        if (response && response.status >= 200 && response.status < 400) {
+          // If a successful response is received, break the loop
+          console.log("Success with URL:", finalUrl);
+          break;
+        }
+      } catch (error) {
+        console.log(`Error fetching from ${finalUrl}:`, parseError(error));
+        // Continue to the next targetHost in case of error
+      }
+    }
+
+    if (response) {
+      res.status(response.status).send(response.data);
+    } else {
+      res.status(500).send('All target hosts failed.');
+    }
   } catch (error) {
-    console.log(parseError(error))
+    console.log("Unexpected error:", parseError(error));
     res.status(500).send('Internal Server Error');
   }
 });
+
 
 app.get('/bridge/forward', async (req, res) => {
   const externalUrl = <string>req.query.url;

@@ -2,6 +2,7 @@ import express from 'express';
 import { fetchWithTimeout } from './fetchWithTimeout';
 import { parseError, sleep } from './utils';
 import { Checker } from './CheckerClass';
+import axios from 'axios';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -11,6 +12,7 @@ async function setEnv() {
 
 setEnv();
 
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.get('/', (req, res) => {
@@ -71,6 +73,26 @@ app.get('/forward*', async (req, res) => {
   }
 });
 
+app.get('/bridge/forward', async (req, res) => {
+  const externalUrl = <string>req.query.url;
+  const queryParams = { ...req.query };
+  delete queryParams.url;
+  if (!externalUrl) {
+    return res.status(400).json({
+      error: 'The "url" query parameter is required.',
+    });
+  }
+
+  try {
+    const response = await axios.get(externalUrl, { params: queryParams });
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({
+      error: `Error forwarding request: ${error.message}`,
+    });
+  }
+});
+
 app.get('/exitSecondary', (req, res, next) => {
   res.send(`exitting Secondary`);
   next()
@@ -122,15 +144,15 @@ async function sendToAll(endpoint: string) {
 
 export async function getDataAndSetEnvVariables(url: string) {
   try {
-      const response = await fetch(url);
-      const jsonData: any = await response.json();
-      for (const key in jsonData) {
-          console.log("Setting Key", key)
-          process.env[key] = jsonData[key];
-      }
-      console.log('Environment variables set successfully!');
+    const response = await fetch(url);
+    const jsonData: any = await response.json();
+    for (const key in jsonData) {
+      console.log("Setting Key", key)
+      process.env[key] = jsonData[key];
+    }
+    console.log('Environment variables set successfully!');
   } catch (error) {
-      console.error('Error retrieving data or setting environment variables:', error);
+    console.error('Error retrieving data or setting environment variables:', error);
   }
 }
 

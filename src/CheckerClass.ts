@@ -214,6 +214,8 @@ export class Checker {
         await this.checkService("https://mytghelper.glitch.me");
         await this.checkService("https://promoteclients1.glitch.me");
         await this.checkService("https://promoteclients2.glitch.me");
+        await this.checkService("https://vc-server.glitch.me");
+
     }
 
 

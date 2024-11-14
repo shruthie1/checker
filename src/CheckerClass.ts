@@ -223,6 +223,7 @@ export class Checker {
         try {
             await axios.get(url, { timeout: 55000 });
             console.log("Pinged :: ", url)
+            await sleep(5000)
         } catch (e) {
             console.log(new Date(Date.now()).toLocaleString('en-IN', this.timeOptions), url, ` NOT Reachable`);
             await fetchWithTimeout(`${ppplbot()}&text=${url}  NOT Reachable`);

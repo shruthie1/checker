@@ -3,6 +3,7 @@ import { fetchWithTimeout } from './fetchWithTimeout';
 import { parseError, sleep } from './utils';
 import { Checker } from './CheckerClass';
 import axios from 'axios';
+import cors from 'cors'
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -12,6 +13,11 @@ async function setEnv() {
 
 setEnv();
 
+app.use(cors({
+  origin: '*', // Allow all origins
+  methods: ['GET', 'PUT', 'POST', 'DELETE', 'PATCH'], // Allowed methods
+  allowedHeaders: ['Content-Type', 'Accept'] // Allowed headers
+}));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 

@@ -212,10 +212,7 @@ export class Checker {
             await sleep(2000)
         }
         await this.checkService("https://mytghelper.glitch.me");
-        await this.checkService("https://promoteclients1.glitch.me");
-        await this.checkService("https://promoteclients2.glitch.me");
         await this.checkService("https://vc-server.glitch.me");
-
     }
 
 

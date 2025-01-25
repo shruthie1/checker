@@ -8,7 +8,8 @@ import cors from 'cors'
 const app = express();
 const port = process.env.PORT || 3000;
 async function setEnv() {
-  await getDataAndSetEnvVariables(`https://mytghelper.glitch.me/configuration`);
+  // await getDataAndSetEnvVariables(`https://mytghelper.glitch.me/configuration`);
+    await getDataAndSetEnvVariables(`https://api.npoint.io/cc57d60feea67e47b6c4`);
 }
 
 setEnv();

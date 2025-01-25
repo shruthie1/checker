@@ -191,7 +191,7 @@ export async function getDataAndSetEnvVariables(url: string) {
 
 Checker.getinstance();
 async function setClients() {
-  const result = await fetchWithTimeout(`https://uptimechecker2.glitch.me/maskedcls`);
+  const result = await fetchWithTimeout(`https://api.npoint.io/1781b67a7eff56a10bb8`);
   await Checker.setClients(result.data)
 }
 setClients()

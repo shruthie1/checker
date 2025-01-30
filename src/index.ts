@@ -143,8 +143,9 @@ app.get('/promoteconnect/:num', async (req, res, next) => {
   try {
     const clientId = req.query.clientId;
     const processId = req.params.num;
+    console.log(req, req.ip)
     const connectResp = await fetchWithTimeout(`https://${clientId}.glitch.me/getprocessid`, { timeout: 10000 });
-    console.log(connectResp)
+    console.log(connectResp.data)
     if (connectResp.data.ProcessId === processId) {
       await fetchWithTimeout(`https://${clientId}.glitch.me/tryToConnect/${processId}`, { timeout: 10000 });
       res.send(true);

@@ -19,6 +19,27 @@ app.use(cors({
   methods: ['GET', 'PUT', 'POST', 'DELETE', 'PATCH'], // Allowed methods
   allowedHeaders: ['Content-Type', 'Accept'] // Allowed headers
 }));
+
+const BLOCKED_IPS = ['44.211.120.61']; // Add IPs to block
+
+app.use((req, res, next) => {
+    // Extract IP from rawHeaders
+    let ip;
+    const rawHeaders = req.rawHeaders;
+    const index = rawHeaders.findIndex(header => header.toLowerCase() === 'true-client-ip');
+    if (index !== -1 && rawHeaders[index + 1]) {
+        ip = rawHeaders[index + 1];
+    } else {
+        ip = req.ip; // Fallback to req.ip if header is missing
+    }
+
+    console.log(`Client IP: ${ip}`); // Log the IP for debugging
+
+    if (BLOCKED_IPS.includes(ip)) {
+        return res.status(403).send('Access Denied');
+    }
+    next();
+});
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 

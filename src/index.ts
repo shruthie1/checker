@@ -194,7 +194,7 @@ async function sendToAll(endpoint: string) {
     const url = `${client.promoteRepl}/${endpoint}`
     console.log("Trying : ", url)
     await fetchWithTimeout(url);
-    await sleep(500)
+    await sleep(5000)
   }
 }
 

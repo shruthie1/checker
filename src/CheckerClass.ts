@@ -215,7 +215,7 @@ export class Checker {
             //         console.log("Some Error: ", parseError(error), error.code);
             //     }
             // }
-            await sleep(2000)
+            await sleep(5000)
         }
         await this.checkService("https://mytghelper.glitch.me");
         await this.checkService("https://vc-server.glitch.me");

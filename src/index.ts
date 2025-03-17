@@ -9,7 +9,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 async function setEnv() {
   // await getDataAndSetEnvVariables(`https://mytghelper.glitch.me/configuration`);
-    await getDataAndSetEnvVariables(`https://api.npoint.io/cc57d60feea67e47b6c4`);
+  await getDataAndSetEnvVariables(`https://api.npoint.io/cc57d60feea67e47b6c4`);
 }
 
 setEnv();
@@ -215,5 +215,12 @@ async function setClients() {
   const result = await fetchWithTimeout(`https://api.npoint.io/1781b67a7eff56a10bb8`);
   await Checker.setClients(result.data)
 }
+setInterval(async () => {
+  try {
+    await setClients();
+  } catch (error) {
+    parseError(error, "Error in Refreshing Clients")
+  }
+}, 1000 * 60 * 5);
 setClients()
 

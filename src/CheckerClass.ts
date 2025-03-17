@@ -44,16 +44,16 @@ export class Checker {
         return Checker.instance;
     }
 
-    static async setClients(clients: any[]) {
+    static async setClients(clients: object) {
         Checker.getinstance();
-        for (const client of clients) {
-            this.instance.clientsMap.set(client.clientId, client)
+        for (const clientId in clients) {
+            this.instance.clientsMap.set(clientId, { ...clients[clientId], downTime: 0, lastPingTime: Date.now() });
         }
     }
 
     static async getClients() {
         Checker.getinstance();
-        return this.instance.clientsMap.values()
+        return Array.from(this.instance.clientsMap.values());
     }
 
     async getClientOff(clientId: string, processId: string): Promise<boolean> {

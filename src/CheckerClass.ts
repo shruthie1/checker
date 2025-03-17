@@ -47,12 +47,18 @@ export class Checker {
         }
         return Checker.instance;
     }
-
     static async setClients(clients: object) {
         Checker.getinstance();
         for (const clientId in clients) {
-            this.instance.clientsMap.set(clientId, { ...clients[clientId], downTime: 0, lastPingTime: Date.now() });
+            const existingData = this.instance.clientsMap.get(clientId)
+            if (existingData) {
+                this.instance.clientsMap.set(clientId, { ...existingData, ...clients[clientId] });
+                console.log(`Client ${clientId} already exists in clientsMap.`);
+            } else {
+                this.instance.clientsMap.set(clientId, { ...clients[clientId], downTime: 0, lastPingTime: Date.now() });
+            }
         }
+        console.log("Clients have been set successfully.");
     }
 
     static async getClients() {

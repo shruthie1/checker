@@ -1,7 +1,8 @@
 import axios from "axios";
 import { fetchWithTimeout } from "./fetchWithTimeout";
 import { parseError } from "./parseError";
-import { sleep, ppplbot } from "./utils";
+import { sleep } from "./utils";
+import { notifbot } from "./logbots";
 console.log("IN Checker Class")
 interface IClient {
     "channelLink": string;
@@ -34,6 +35,7 @@ export class Checker {
 
     constructor() {
         this.main();
+        fetchWithTimeout(`${notifbot()}&text=Promote Checker Started`);
     };
 
     static getinstance(): Checker {
@@ -122,7 +124,7 @@ export class Checker {
         setInterval(async () => {
             this.count = this.count + 1
             this.connectToNewClients();
-            if (this.count % 10 == 1) {
+            if (this.count % 12 == 1) {
                 console.log(`-------------------------------------------------------------`)
                 await this.checkPings()
             }
@@ -163,13 +165,13 @@ export class Checker {
                             await axios.get(client.promoteRepl);
                         } catch (e) {
                             await fetchWithTimeout(url, {})
-                            await fetchWithTimeout(`${ppplbot()}&text=${client.clientId} : Not responding | url = ${url}`);
+                            await fetchWithTimeout(`${notifbot()}&text=${client.clientId} : Not responding | url = ${url}`);
                         }
                     } else {
-                        await fetchWithTimeout(`${ppplbot()}&text=${client.clientId} : not responding - ${(Date.now() - client.lastPingTime) / 60000}`);
+                        await fetchWithTimeout(`${notifbot()}&text=${client.clientId} : not responding - ${(Date.now() - client.lastPingTime) / 60000}`);
                     }
                 } catch (error) {
-                    await fetchWithTimeout(`${ppplbot()}&text=${client.clientId} : Url not responding`);
+                    await fetchWithTimeout(`${notifbot()}&text=${client.clientId} : Url not responding`);
                     console.log("Some Error: ", parseError(error), error.code);
                 }
             }
@@ -189,14 +191,14 @@ export class Checker {
                     try {
                         const resp = await fetchWithTimeout(`${client.deployKey}`, { timeout: 120000 });
                         if (resp?.status == 200 || resp.status == 201) {
-                            await fetchWithTimeout(`${ppplbot()}&text=Restarted ${client.clientId}`);
+                            await fetchWithTimeout(`${notifbot()}&text=Restarted ${client.clientId}`);
                         } else {
                             console.log(`Failed to Restart ${client.clientId}`);
-                            await fetchWithTimeout(`${ppplbot()}&text=Failed to Restart ${client.clientId}`);
+                            await fetchWithTimeout(`${notifbot()}&text=Failed to Restart ${client.clientId}`);
                         }
                     } catch (error) {
                         console.log(`Failed to Restart ${client.clientId}`);
-                        await fetchWithTimeout(`${ppplbot()}&text=Failed to Restart ${client.clientId}`);
+                        await fetchWithTimeout(`${notifbot()}&text=Failed to Restart ${client.clientId}`);
                     }
                 }
             }
@@ -224,17 +226,17 @@ export class Checker {
             await sleep(5000)
         } catch (e) {
             console.log(new Date(Date.now()).toLocaleString('en-IN', this.timeOptions), url, ` NOT Reachable`);
-            await fetchWithTimeout(`${ppplbot()}&text=${url}  NOT Reachable`);
+            await fetchWithTimeout(`${notifbot()}&text=${url}  NOT Reachable`);
             try {
                 if (deployKey) {
                     const resp = await axios.get(`${deployKey ? deployKey : `${url}/exit`}`, { timeout: 55000 });
                     if (resp?.status == 200 || resp.status == 201) {
-                        await fetchWithTimeout(`${ppplbot()}&text=Restarted ${url}`);
+                        await fetchWithTimeout(`${notifbot()}&text=Restarted ${url}`);
                     }
                 }
             } catch (error) {
                 console.log(`Cannot restart ${url} server`);
-                await fetchWithTimeout(`${ppplbot()}&text=Cannot restart ${url} server`);
+                await fetchWithTimeout(`${notifbot()}&text=Cannot restart ${url} server`);
             }
         }
     }

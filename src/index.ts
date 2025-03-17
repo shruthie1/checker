@@ -1,9 +1,11 @@
 import express from 'express';
 import { fetchWithTimeout } from './fetchWithTimeout';
-import { parseError, sleep } from './utils';
 import { Checker } from './CheckerClass';
 import axios from 'axios';
 import cors from 'cors'
+import { notifbot } from './logbots';
+import { sleep } from './utils';
+import { parseError } from './parseError';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -224,3 +226,13 @@ setInterval(async () => {
 }, 1000 * 60 * 5);
 setClients()
 
+process.on('unhandledRejection', (reason, promise) => {
+  console.log('Unhandled Rejection at:', promise, 'reason:', reason);
+  // Application specific logging, throwing an error, or other logic here
+  fetchWithTimeout(`${notifbot()}&text=Unhandled Promise Rejection ${JSON.stringify(reason)}`);
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+  parseError(error, "Uncaught Exception")
+});

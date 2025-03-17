@@ -1,62 +1,197 @@
-import axios, { AddressFamily, AxiosRequestConfig } from "axios";
-import { parseError } from "./parseError";
-import { ppplbot } from "./utils";
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import { extractMessage, parseError } from "./parseError";
+import { ppplbot } from "./logbots";
 
-export async function fetchWithTimeout(resource: string, options: AxiosRequestConfig = {}, sendErr: boolean = true, maxRetries: number = 1) {
-    options.timeout = options.timeout || 50000;
-    options.method = options.method || 'GET';
+export async function fetchWithTimeout(
+    url: string,
+    options: AxiosRequestConfig & { bypassUrl?: string } = {},
+    maxRetries = 1
+): Promise<AxiosResponse | undefined> {
+    if (!url) {
+        console.error('URL is empty');
+        return undefined;
+    }
 
-    const fetchWithProtocol = async (url: string, version: AddressFamily) => {
-        const source = axios.CancelToken.source();
-        const id = setTimeout(() => {
-            source.cancel(`Request timed out after ${options.timeout}ms`);
-        }, options.timeout);
-        const defaultHeaders = {
-            'Content-Type': 'application/json'
-        };
-        const headers = { ...defaultHeaders, ...options.headers };
+    options.timeout = options.timeout || 30000; // Set default timeout to 30 seconds
+    options.method = options.method || "GET";
+    let lastError: Error | null = null;
+
+    console.log(`Trying: ${url}`);
+    const parsedUrl = new URL(url);
+    const host = parsedUrl.host;
+    const endpoint = parsedUrl.pathname + parsedUrl.search;
+
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        const controller = new AbortController();
+        const currentTimeout = options.timeout + (attempt * 5000); // Add 5 seconds per retry
+        const timeoutId = setTimeout(() => controller.abort(), currentTimeout);
+
         try {
             const response = await axios({
-                headers,
                 ...options,
                 url,
-                cancelToken: source.token,
-                family: version
+                signal: controller.signal,
+                maxRedirects: 5,
             });
-            clearTimeout(id);
+            clearTimeout(timeoutId);
             return response;
         } catch (error) {
-            clearTimeout(id);
-            console.log(`Error at URL (IPv${version}): `, url);
-            if (axios.isCancel(error)) {
-                console.log('Request canceled:', error.message, url);
-                return undefined;
-            }
-            throw error; // Rethrow the error to handle retry logic outside
-        }
-    };
+            clearTimeout(timeoutId);
+            lastError = error;
+            const parsedError = parseError(error, `host: ${host}\nendpoint:${endpoint}`, false);
 
-    for (let retryCount = 0; retryCount <= maxRetries; retryCount++) {
-        try {
-            const responseIPv4 = await fetchWithProtocol(resource, 4);
-            if (responseIPv4) return responseIPv4;
-            const responseIPv6 = await fetchWithProtocol(resource, 6);
-            if (responseIPv6) return responseIPv6;
-        } catch (error: any) {
-            console.log("Error at URL : ", resource)
-            const errorDetails = parseError(error, undefined, false)
-            if (errorDetails.status.toString() !== '429' && error.code !== 'ERR_NETWORK' && error.code !== "ECONNABORTED" && error.code !== "ETIMEDOUT" && !errorDetails.message.toLowerCase().includes('too many requests') && !axios.isCancel(error)) {
-                if (retryCount < maxRetries) {
-                    console.log(`Retrying... (${retryCount + 1}/${maxRetries})`);
-                    await new Promise(resolve => setTimeout(resolve, 2000)); // 2 seconds delay
-                } else {
-                    console.log(`All ${maxRetries + 1} retries failed for ${resource}`);
-                    if (sendErr) {
-                        axios.get(`${ppplbot()}&text=${encodeURIComponent(`HELPER :: All ${maxRetries + 1} retries failed for ${resource}\n${errorDetails.message}`)}`)
-                    }
+            const message = extractMessage(parsedError);
+            const isTimeout = axios.isAxiosError(error) &&
+                (error.code === "ECONNABORTED" ||
+                    error.message.includes("timeout") ||
+                    parsedError.status === 408);
+
+            if (isTimeout) {
+                console.error(`Request timeout (${options.timeout}ms): ${url}`);
+                notify(`Timeout on attempt ${attempt}`, {
+                    message: `${process.env.clientId} host=${host}\nendpoint=${endpoint}\ntimeout=${options.timeout}ms`,
+                    status: 408
+                });
+            } else {
+                notify(`Attempt ${attempt} failed`, {
+                    message: `${process.env.clientId} host=${host}\nendpoint=${endpoint}\n${message.length < 250 ? `msg: ${message}` : "msg: Message too long"}`,
+                    status: parsedError.status
+                });
+            }
+
+            if (parsedError.status === 403) {
+                notify(`Attempting bypass for`, { message: `${process.env.clientId}  host=${host}\nendpoint=${endpoint}` });
+                try {
+                    const bypassResponse = await makeBypassRequest(url, options);
+                    notify(`Successfully executed 403 request`, { message: `${process.env.clientId} host=${host}\nendpoint=${endpoint}` });
+                    return bypassResponse;
+                } catch (bypassError) {
+                    const errorDetails = extractMessage(parseError(bypassError, `host: ${host}\nendpoint:${endpoint}`, false));
+                    notify(`Bypass attempt failed`, `host=${host}\nendpoint=${endpoint}\n${errorDetails.length < 250 ? `msg: ${errorDetails}` : "msg: Message too long"}`);
                     return undefined;
                 }
             }
+
+            if (attempt < maxRetries && (shouldRetry(error, parsedError) || isRetryableStatus(parsedError.status))) {
+                const delay = calculateBackoff(attempt);
+                console.log(`Retrying request (${attempt + 1}/${maxRetries}) after ${delay}ms`);
+                await sleep(delay);
+                continue;
+            }
+            return undefined;
         }
     }
+    const errorData = extractMessage(parseError(lastError, `${process.env.clientId} host: ${host}\nendpoint:${endpoint}`, false));
+    notify(`All ${maxRetries} retries exhausted`, `${errorData.length < 250 ? `msg: ${errorData}` : "msg: Message too long"}`);
+    return undefined;
+}
+
+async function makeBypassRequest(url: string, options: AxiosRequestConfig & { bypassUrl?: string }): Promise<AxiosResponse | undefined> {
+    if (!options.bypassUrl && !process.env.bypassURL) {
+        console.error('Bypass URL is not provided');
+        throw new Error('Bypass URL is not provided');
+    }
+
+    options.bypassUrl = options.bypassUrl || `${process.env.bypassURL}/execute-request`;
+
+    const bypassAxios = axios.create({
+        responseType: options.responseType || 'json',
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity,
+        timeout: options.timeout || 30000
+    });
+
+    const response = await bypassAxios.post(options.bypassUrl, {
+        url,
+        method: options.method,
+        headers: options.headers,
+        data: options.data,
+        params: options.params,
+        responseType: options.responseType,
+        timeout: options.timeout,
+        followRedirects: options.maxRedirects !== 0,
+        maxRedirects: options.maxRedirects
+    }, {
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+
+    if (options.responseType === 'arraybuffer' ||
+        response.headers['content-type']?.includes('application/octet-stream') ||
+        response.headers['content-type']?.includes('image/') ||
+        response.headers['content-type']?.includes('audio/') ||
+        response.headers['content-type']?.includes('video/') ||
+        response.headers['content-type']?.includes('application/pdf')) {
+
+        response.data = Buffer.from(response.data);
+    }
+
+    return response;
+}
+
+function shouldRetry(error: any, parsedError: any): boolean {
+    if (axios.isAxiosError(error)) {
+        const networkErrors = [
+            'ETIMEDOUT',
+            'ECONNABORTED',
+            'ECONNREFUSED',
+            'ECONNRESET',
+            'ERR_NETWORK',
+            'ERR_BAD_RESPONSE',
+            'EHOSTUNREACH',
+            'ENETUNREACH'
+        ];
+
+        if (networkErrors.includes(error.code)) {
+            return true;
+        }
+
+        if (error.message?.toLowerCase().includes('timeout')) {
+            return true;
+        }
+    }
+
+    return isRetryableStatus(parsedError.status);
+}
+
+function notify(prefix: string, errorDetails: any) {
+    const errorMessage = typeof errorDetails.message === 'string'
+        ? errorDetails.message
+        : JSON.stringify(errorDetails.message);
+
+    console.error(`${prefix}\n${errorMessage.includes('ETIMEDOUT') ? 'Connection timed out' :
+        errorMessage.includes('ECONNREFUSED') ? 'Connection refused' :
+            extractMessage(errorDetails?.message)
+        }`);
+
+    if (errorDetails.status === 429) return;
+
+    const notificationText = `${prefix}\n\n${errorMessage.includes('ETIMEDOUT') ? 'Connection timed out' :
+        errorMessage.includes('ECONNREFUSED') ? 'Connection refused' :
+            extractMessage(errorDetails?.message)
+        }`;
+
+    try {
+        axios.get(`${ppplbot(process.env.httpFailuresChannel)}&text=${encodeURIComponent(notificationText)}`);
+    } catch (error) {
+        console.error("Failed to notify failure:", error);
+    }
+}
+
+function isRetryableStatus(status: number): boolean {
+    return [408, 500, 502, 503, 504, 429].includes(status);
+}
+
+function calculateBackoff(attempt: number): number {
+    const minDelay = 500; // Start with 500ms
+    const maxDelay = 30000; // Cap at 30 seconds
+    const base = Math.min(minDelay * Math.pow(2, attempt), maxDelay);
+    const jitter = Math.random() * (base * 0.2); // Add up to 20% jitter
+    return Math.floor(base + jitter);
+}
+
+function sleep(delay: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, delay));
 }

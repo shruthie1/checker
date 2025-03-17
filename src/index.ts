@@ -13,7 +13,7 @@ async function setEnv() {
   // await getDataAndSetEnvVariables(`https://mytghelper.glitch.me/configuration`);
   await getDataAndSetEnvVariables(`https://api.npoint.io/cc57d60feea67e47b6c4`);
 }
-
+let canExit = Date.now();
 setEnv();
 
 app.use(cors({
@@ -46,6 +46,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.get('/', (req, res) => {
+  canExit = Date.now();
   res.send("Hello World");
 })
 app.get('/sendtoall', (req, res, next) => {
@@ -219,6 +220,10 @@ async function setClients() {
 }
 setInterval(async () => {
   try {
+    if (canExit < Date.now() - 1000 * 60 * 15) {
+      console.log("Exiting due to inactivity")
+      process.exit(1);
+    }
     await setClients();
   } catch (error) {
     parseError(error, "Error in Refreshing Clients")

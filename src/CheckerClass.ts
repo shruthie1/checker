@@ -4,6 +4,8 @@ import { parseError } from "./parseError";
 import { sleep } from "./utils";
 import { notifbot } from "./logbots";
 console.log("IN Checker Class")
+export const prcessID = Math.floor(Math.random() * 1234);
+
 interface IClient {
     "channelLink": string;
     "dbcoll": string,
@@ -125,7 +127,7 @@ export class Checker {
             this.count = this.count + 1
             this.connectToNewClients();
             if (this.count % 12 == 1) {
-                console.log(`-------------------------------------------------------------`)
+                console.log(`------------------------checkingPings: ${prcessID} :: ${this.count}-------------------------------------`)
                 await this.checkPings()
             }
         }, 30000)

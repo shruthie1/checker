@@ -215,7 +215,7 @@ export async function getDataAndSetEnvVariables(url: string) {
 
 Checker.getinstance();
 async function setClients() {
-  const result = await fetchWithTimeout(`https://api.npoint.io/1781b67a7eff56a10bb8`);
+  const result = await fetchWithTimeout(`https://api.npoint.io/f0d1e44d82893490bbde`);
   await Checker.setClients(result.data)
 }
 setInterval(async () => {

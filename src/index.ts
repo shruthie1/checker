@@ -72,7 +72,7 @@ app.get('/exitPrimary', (req, res, next) => {
 });
 
 
-app.get('/tgclientoff/:processId', (req, res, next) => {
+app.get('/promoteconnect/:processId', (req, res, next) => {
   const clientId = <string>req.query.clientId
   Checker.getinstance().getClientOff(clientId, req.params.processId);
   res.send("Ok")
@@ -163,25 +163,25 @@ app.get('/exitSecondary', (req, res, next) => {
   }
 });
 
-app.get('/promoteconnect/:num', async (req, res, next) => {
-  try {
-    const clientId = req.query.clientId;
-    const processId = req.params.num;
-    const connectResp = await fetchWithTimeout(`https://${clientId}.glitch.me/getprocessid`, { timeout: 10000 });
-    console.log(connectResp.data)
-    if (connectResp.data.ProcessId === processId) {
-      await fetchWithTimeout(`https://${clientId}.glitch.me/tryToConnect/${processId}`, { timeout: 10000 });
-      res.send(true);
-    } else {
-      console.log(`Actual Process Id from https://${clientId}.glitch.me/getprocessid :: `, connectResp.data.ProcessId, " but received : ", processId);
-      console.log("Request received from Unknown process");
-      res.send(false);
-    }
-  } catch (error) {
-    parseError(error, "Some Error here:")
-    res.send(false);
-  }
-});
+// app.get('/promoteconnect/:num', async (req, res, next) => {
+//   try {
+//     const clientId = req.query.clientId;
+//     const processId = req.params.num;
+//     const connectResp = await fetchWithTimeout(`https://${clientId}.glitch.me/getprocessid`, { timeout: 10000 });
+//     console.log(connectResp.data)
+//     if (connectResp.data.ProcessId === processId) {
+//       await fetchWithTimeout(`https://${clientId}.glitch.me/tryToConnect/${processId}`, { timeout: 10000 });
+//       res.send(true);
+//     } else {
+//       console.log(`Actual Process Id from https://${clientId}.glitch.me/getprocessid :: `, connectResp.data.ProcessId, " but received : ", processId);
+//       console.log("Request received from Unknown process");
+//       res.send(false);
+//     }
+//   } catch (error) {
+//     parseError(error, "Some Error here:")
+//     res.send(false);
+//   }
+// });
 
 
 app.listen(port, () => {

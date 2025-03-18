@@ -187,45 +187,33 @@ export class Checker {
             if (client.downTime > 2) {
                 console.log(client.clientId, " - ", client.downTime)
             }
-            try {
-                await axios.get(`${client.promoteRepl}`, { timeout: 120000 });
-                this.clientsMap.set(client.clientId, { ...client, downTime: 0 });
-                console.log("Pinged :: ", client.promoteRepl)
-            } catch (e) {
-                parseError(e, `Error while pinging ${client.promoteRepl}`, false);
-                console.log(new Date(Date.now()).toLocaleString('en-IN', this.timeOptions), client.promoteRepl, ` NOT Reachable - ${client.downTime}`);
-                this.clientsMap.set(client.clientId, { ...client, downTime: client.downTime + 1 })
-                if (client.downTime > 5) {
-                    this.clientsMap.set(client.clientId, { ...client, downTime: -5 })
-                    try {
-                        const url = client.promoteRepl.includes('glitch') ? `${client.promoteRepl}/exit` : client.deployKey;
-                        const resp = await fetchWithTimeout(`${url}`, { timeout: 120000 });
-                        if (resp?.status == 200 || resp.status == 201) {
-                            await fetchWithTimeout(`${notifbot()}&text=Restarted ${client.clientId}`);
-                        } else {
-                            console.log(`Failed to Restart ${client.clientId}`);
-                            await fetchWithTimeout(`${notifbot()}&text=Failed to Restart ${client.clientId}`);
-                        }
-                    } catch (error) {
-                        console.log(`Failed to Restart ${client.clientId}`);
-                        await fetchWithTimeout(`${notifbot()}&text=Failed to Restart ${client.clientId}`);
-                    }
-                }
-            }
-
-            // const userPromoteStats = await db.readSinglePromoteStats(val.clientId);
-            // if (userPromoteStats?.isActive && (Date.now() - userPromoteStats?.lastUpdatedTimeStamp) / (1000 * 60) > 12) {
-            //     try {
-            //         const resp = await axios.get(`${val.url}promote`, { timeout: 120000 });
-            //     } catch (error) {
-            //         console.log("Some Error: ", parseError(error), error.code);
+            // try {
+            //     await axios.get(`${client.promoteRepl}`, { timeout: 120000 });
+            //     this.clientsMap.set(client.clientId, { ...client, downTime: 0 });
+            //     console.log("Pinged :: ", client.promoteRepl)
+            // } catch (e) {
+            //     parseError(e, `Error while pinging ${client.promoteRepl}`, false);
+            //     console.log(new Date(Date.now()).toLocaleString('en-IN', this.timeOptions), client.promoteRepl, ` NOT Reachable - ${client.downTime}`);
+            //     this.clientsMap.set(client.clientId, { ...client, downTime: client.downTime + 1 })
+            //     if (client.downTime > 5) {
+            //         this.clientsMap.set(client.clientId, { ...client, downTime: -5 })
+            //         try {
+            //             const url = client.promoteRepl.includes('glitch') ? `${client.promoteRepl}/exit` : client.deployKey;
+            //             const resp = await fetchWithTimeout(`${url}`, { timeout: 120000 });
+            //             if (resp?.status == 200 || resp.status == 201) {
+            //                 await fetchWithTimeout(`${notifbot()}&text=Restarted ${client.clientId}`);
+            //             } else {
+            //                 console.log(`Failed to Restart ${client.clientId}`);
+            //                 await fetchWithTimeout(`${notifbot()}&text=Failed to Restart ${client.clientId}`);
+            //             }
+            //         } catch (error) {
+            //             console.log(`Failed to Restart ${client.clientId}`);
+            //             await fetchWithTimeout(`${notifbot()}&text=Failed to Restart ${client.clientId}`);
+            //         }
             //     }
             // }
             await sleep(5000)
         }
-        await this.checkService("https://mytghelper.glitch.me");
-        await this.checkService("https://vc-server.glitch.me");
-        await this.checkService("https://promoteClients2.glitch.me");
     }
 
 

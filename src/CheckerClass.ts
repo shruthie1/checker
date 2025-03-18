@@ -132,10 +132,7 @@ export class Checker {
         setInterval(async () => {
             this.count = this.count + 1
             this.connectToNewClients();
-            if (this.count % 12 == 1) {
-                console.log(`------------------------checkingPings: ${prcessID} :: ${this.count}-------------------------------------`)
-                await this.checkPings()
-            }
+            await this.checkPings()
         }, 30000)
     }
 
@@ -162,7 +159,7 @@ export class Checker {
     }
 
     async checkPings() {
-        console.log("Checking Pings")
+        console.log(`------------------------checkingPings: ${prcessID} :: ${this.count}-------------------------------------`)
         for (const client of Array.from(this.clientsMap.values())) {
             if ((Date.now() - this.pings[client.clientId]) > (5 * 60 * 1000) && (Date.now() - client.lastPingTime) > (5 * 60 * 1000)) {
                 try {
@@ -173,19 +170,19 @@ export class Checker {
                             await axios.get(client.promoteRepl);
                         } catch (e) {
                             await fetchWithTimeout(url, {})
-                            await fetchWithTimeout(`${notifbot()}&text=${client.clientId} : Not responding | url = ${url}`);
+                            await fetchWithTimeout(`${notifbot()}&text=${client.promoteRepl} : Not responding | url = ${url}`);
                         }
                     } else {
-                        await fetchWithTimeout(`${notifbot()}&text=${client.clientId} : not responding - ${(Date.now() - client.lastPingTime) / 60000}`);
+                        await fetchWithTimeout(`${notifbot()}&text=${client.promoteRepl} : not responding - ${(Date.now() - client.lastPingTime) / 60000}`);
                     }
                 } catch (error) {
-                    await fetchWithTimeout(`${notifbot()}&text=${client.clientId} : Url not responding`);
+                    await fetchWithTimeout(`${notifbot()}&text=${client.promoteRepl} : Url not responding`);
                     console.log("Some Error: ", parseError(error), error.code);
                 }
             }
 
             if (client.downTime > 2) {
-                console.log(client.clientId, " - ", client.downTime)
+                console.log(client.promoteRepl, " - ", client.downTime)
             }
             // try {
             //     await axios.get(`${client.promoteRepl}`, { timeout: 120000 });

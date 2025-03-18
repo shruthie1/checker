@@ -37,7 +37,7 @@ export class Checker {
 
     constructor() {
         this.main();
-        fetchWithTimeout(`${notifbot()}&text=Promote Checker Started`);
+        fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=Promote Checker Started`);
     };
 
     static getinstance(): Checker {
@@ -172,13 +172,13 @@ export class Checker {
                             await axios.get(client.promoteRepl);
                         } catch (e) {
                             await fetchWithTimeout(url, {})
-                            await fetchWithTimeout(`${notifbot()}&text=${client.promoteRepl} : Not responding | url = ${url}`);
+                            await fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=${client.promoteRepl} : Not responding | url = ${url}`);
                         }
                     } else {
-                        await fetchWithTimeout(`${notifbot()}&text=${client.promoteRepl} : not responding - ${(Date.now() - client.lastPingTime) / 60000}`);
+                        await fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=${client.promoteRepl} : not responding - ${(Date.now() - client.lastPingTime) / 60000}`);
                     }
                 } catch (error) {
-                    await fetchWithTimeout(`${notifbot()}&text=${client.promoteRepl} : Url not responding`);
+                    await fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=${client.promoteRepl} : Url not responding`);
                     console.log("Some Error: ", parseError(error), error.code);
                 }
             }
@@ -200,14 +200,14 @@ export class Checker {
             //             const url = client.promoteRepl.includes('glitch') ? `${client.promoteRepl}/exit` : client.deployKey;
             //             const resp = await fetchWithTimeout(`${url}`, { timeout: 120000 });
             //             if (resp?.status == 200 || resp.status == 201) {
-            //                 await fetchWithTimeout(`${notifbot()}&text=Restarted ${client.clientId}`);
+            //                 await fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=Restarted ${client.clientId}`);
             //             } else {
             //                 console.log(`Failed to Restart ${client.clientId}`);
-            //                 await fetchWithTimeout(`${notifbot()}&text=Failed to Restart ${client.clientId}`);
+            //                 await fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=Failed to Restart ${client.clientId}`);
             //             }
             //         } catch (error) {
             //             console.log(`Failed to Restart ${client.clientId}`);
-            //             await fetchWithTimeout(`${notifbot()}&text=Failed to Restart ${client.clientId}`);
+            //             await fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=Failed to Restart ${client.clientId}`);
             //         }
             //     }
             // }
@@ -223,17 +223,17 @@ export class Checker {
             await sleep(5000)
         } catch (e) {
             console.log(new Date(Date.now()).toLocaleString('en-IN', this.timeOptions), url, ` NOT Reachable`);
-            await fetchWithTimeout(`${notifbot()}&text=${url}  NOT Reachable`);
+            await fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=${url}  NOT Reachable`);
             try {
                 if (deployKey) {
                     const resp = await axios.get(`${deployKey ? deployKey : `${url}/exit`}`, { timeout: 55000 });
                     if (resp?.status == 200 || resp.status == 201) {
-                        await fetchWithTimeout(`${notifbot()}&text=Restarted ${url}`);
+                        await fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=Restarted ${url}`);
                     }
                 }
             } catch (error) {
                 console.log(`Cannot restart ${url} server`);
-                await fetchWithTimeout(`${notifbot()}&text=Cannot restart ${url} server`);
+                await fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=Cannot restart ${url} server`);
             }
         }
     }

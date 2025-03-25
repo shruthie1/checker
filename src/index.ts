@@ -14,7 +14,10 @@ async function setEnv() {
   await getDataAndSetEnvVariables(`https://api.npoint.io/cc57d60feea67e47b6c4`);
 }
 let canExit = Date.now();
-setEnv();
+setEnv().then(() => {
+  console.log("Env Variables Set");
+  fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=Promote Checker Started`);
+});
 
 app.use(cors({
   origin: '*', // Allow all origins

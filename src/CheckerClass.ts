@@ -37,7 +37,6 @@ export class Checker {
 
     constructor() {
         this.main();
-        fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=Promote Checker Started`);
     };
 
     static getinstance(): Checker {

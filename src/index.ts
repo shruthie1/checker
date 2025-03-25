@@ -15,7 +15,6 @@ async function setEnv() {
 }
 let canExit = Date.now();
 setEnv().then(() => {
-  console.log("Env Variables Set");
   fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=Promote Checker Started`);
 });
 

@@ -46,18 +46,7 @@ export async function fetchWithTimeout(
                     message.includes("timeout") ||
                     parsedError.status === 408);
 
-            if (isTimeout) {
-                console.error(`Request timeout (${options.timeout}ms): ${url}`);
-                notify(`Timeout on attempt ${attempt}`, {
-                    message: `${process.env.clientId} host=${host}\nendpoint=${endpoint}\ntimeout=${options.timeout}ms`,
-                    status: 408
-                });
-            } else {
-                notify(`Attempt ${attempt} failed`, {
-                    message: `${process.env.clientId} host=${host}\nendpoint=${endpoint}\n${message.length < 250 ? `msg: ${message}` : "msg: Message too long"}`,
-                    status: parsedError.status
-                });
-            }
+
 
             if (parsedError.status === 403 || parsedError.status === 495) {
                 notify(`Attempting bypass for`, { message: `${process.env.clientId}  host=${host}\nendpoint=${endpoint}` });
@@ -69,6 +58,19 @@ export async function fetchWithTimeout(
                     const errorDetails = extractMessage(parseError(bypassError, `host: ${host}\nendpoint:${endpoint}`, false));
                     notify(`Bypass attempt failed`, { message: `host=${host}\nendpoint=${endpoint}\n${errorDetails.length < 250 ? `msg: ${errorDetails}` : "msg: Message too long"}` });
                     return undefined;
+                }
+            } else {
+                if (isTimeout) {
+                    console.error(`Request timeout (${options.timeout}ms): ${url}`);
+                    notify(`Timeout on attempt ${attempt}`, {
+                        message: `${process.env.clientId} host=${host}\nendpoint=${endpoint}\ntimeout=${options.timeout}ms`,
+                        status: 408
+                    });
+                } else {
+                    notify(`Attempt ${attempt} failed`, {
+                        message: `${process.env.clientId} host=${host}\nendpoint=${endpoint}\n${message.length < 250 ? `msg: ${message}` : "msg: Message too long"}`,
+                        status: parsedError.status
+                    });
                 }
             }
 

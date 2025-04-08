@@ -234,12 +234,12 @@ setInterval(async () => {
 setClients()
 
 process.on('unhandledRejection', (reason, promise) => {
-  console.log('Unhandled Rejection at:', promise, 'reason:', reason);
+  console.log('Unhandled Rejection at Checker 2:', promise, 'reason:', reason);
   // Application specific logging, throwing an error, or other logic here
   fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=Unhandled Promise Rejection ${JSON.stringify(reason)}`);
 });
 
 process.on('uncaughtException', (error) => {
-  console.error('Uncaught Exception:', error);
+  console.error('Uncaught Exception At Checker 2:', error);
   parseError(error, "Uncaught Exception")
 });

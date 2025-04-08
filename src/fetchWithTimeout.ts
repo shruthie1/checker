@@ -2,6 +2,7 @@ import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { extractMessage, parseError } from "./parseError";
 import { ppplbot } from "./logbots";
 import { sleep } from "./utils";
+
 export async function fetchWithTimeout(
     url: string,
     options: AxiosRequestConfig & { bypassUrl?: string } = {},
@@ -17,9 +18,15 @@ export async function fetchWithTimeout(
     let lastError: Error | null = null;
 
     console.log(`Trying: ${url}`);
-    const parsedUrl = new URL(url);
-    const host = parsedUrl.host;
-    const endpoint = parsedUrl.pathname + parsedUrl.search;
+
+    try {
+        const parsedUrl = new URL(url);
+        var host = parsedUrl.host;
+        var endpoint = parsedUrl.pathname + parsedUrl.search;
+    } catch (error) {
+        console.error(`Invalid URL: ${url}`);
+        return undefined;
+    }
 
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
         const controller = new AbortController();
@@ -32,12 +39,13 @@ export async function fetchWithTimeout(
                 url,
                 signal: controller.signal,
                 maxRedirects: 5,
+                timeout: currentTimeout, // Use the increased timeout for axios request too
             });
             clearTimeout(timeoutId);
             return response;
         } catch (error) {
             clearTimeout(timeoutId);
-            lastError = error;
+            lastError = error instanceof Error ? error : new Error(String(error));
             const parsedError = parseError(error, `host: ${host}\nendpoint:${endpoint}`, false);
 
             const message = extractMessage(parsedError);
@@ -45,7 +53,6 @@ export async function fetchWithTimeout(
                 (error.code === "ECONNABORTED" ||
                     message.includes("timeout") ||
                     parsedError.status === 408);
-
 
 
             if (parsedError.status === 403 || parsedError.status === 495) {

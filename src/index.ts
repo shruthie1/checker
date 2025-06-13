@@ -73,6 +73,20 @@ app.get('/exitPrimary', (req, res, next) => {
   }
 });
 
+app.get('/clients', async (req, res) => {
+  const clients = await Checker.getClients();
+  res.json(clients);
+})
+
+app.get('refreshClients', async (req, res) => {
+  try {
+    await setClients();
+    res.send("Clients refreshed successfully");
+  } catch (error) {
+    console.error("Error refreshing clients:", error);
+    res.status(500).send("Error refreshing clients");
+  }
+});
 
 app.get('/promoteconnect/:processId', (req, res, next) => {
   const clientId = <string>req.query.clientId

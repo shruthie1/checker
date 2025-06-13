@@ -214,7 +214,6 @@ export class Checker {
         }
 
         await this.checkService("https://mytghelper.glitch.me/");
-        await this.checkService("https://cms-nst.glitch.me/");
         await this.checkService("https://uptimeChecker2.glitch.me/");
         await this.checkService("https://promoteClients2.glitch.me/");
     }

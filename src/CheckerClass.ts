@@ -213,7 +213,7 @@ export class Checker {
             await sleep(3000)
         }
 
-        await this.checkService("https://mytghelper.glitch.me/");
+        await this.checkService("https://ums-test.paidgirl.site/");
         await this.checkService("https://uptimeChecker2.glitch.me/");
         await this.checkService("https://promoteClients2.glitch.me/");
     }

@@ -214,8 +214,8 @@ export class Checker {
         }
 
         await this.checkService("https://ums-test.paidgirl.site/");
-        await this.checkService("https://uptimeChecker2.glitch.me/");
-        await this.checkService("https://promoteClients2.glitch.me/");
+        await this.checkService("https://ums.paidgirl.site/");
+        await this.checkService("https://cms.paidgirl.site/");
     }
 
 

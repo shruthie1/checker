@@ -63,7 +63,7 @@ app.get('/exitPrimary', (req, res, next) => {
   res.send(`exitting Primary`);
   next()
 }, async (req, res) => {
-  const result = await fetchWithTimeout(`https://uptimechecker2.glitch.me/maskedcls`);
+  const result = await fetchWithTimeout(`https://ums.paidgirl.site/maskedcls`);
   const clients = result?.data;
   for (const client of clients) {
     if (client.clientId.toLowerCase().includes('1')) {
@@ -169,7 +169,7 @@ app.get('/exitSecondary', (req, res, next) => {
   res.send(`exitting Secondary`);
   next()
 }, async (req, res) => {
-  const result = await fetchWithTimeout(`https://uptimechecker2.glitch.me/maskedcls`);
+  const result = await fetchWithTimeout(`https://ums.paidgirl.site/maskedcls`);
   const clients = result?.data;
   for (const client of clients) {
     if (client.clientId.toLowerCase().includes('2')) {

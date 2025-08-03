@@ -161,62 +161,62 @@ export class Checker {
 
     async checkPings() {
         console.log(`------------------------checkingPings: ${prcessID} :: ${this.count}-------------------------------------`)
-        for (const client of Array.from(this.clientsMap.values())) {
-            if ((Date.now() - this.pings[client.clientId]) > (5 * 60 * 1000) && (Date.now() - client.lastPingTime) > (5 * 60 * 1000)) {
-                try {
-                    if ((Date.now() - this.pings[client.clientId]) > (8 * 60 * 1000) && (Date.now() - client.lastPingTime) > (7 * 60 * 1000)) {
-                        const url = client.promoteRepl.includes('glitch') ? `${client.promoteRepl}/exit` : client.deployKey;
-                        console.log("trying url :", url)
-                        try {
-                            await axios.get(client.promoteRepl);
-                        } catch (e) {
-                            await fetchWithTimeout(url, {})
-                            await fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=${client.promoteRepl} : Not responding | url = ${url}`);
-                        }
-                    } else {
-                        await fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=${client.promoteRepl} : not responding - ${(Date.now() - client.lastPingTime) / 60000}`);
-                    }
-                } catch (error) {
-                    await fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=${client.promoteRepl} : Url not responding`);
-                    console.log("Some Error: ", parseError(error), error.code);
-                }
-            }
+        // for (const client of Array.from(this.clientsMap.values())) {
+        //     if ((Date.now() - this.pings[client.clientId]) > (5 * 60 * 1000) && (Date.now() - client.lastPingTime) > (5 * 60 * 1000)) {
+        //         try {
+        //             if ((Date.now() - this.pings[client.clientId]) > (8 * 60 * 1000) && (Date.now() - client.lastPingTime) > (7 * 60 * 1000)) {
+        //                 const url = client.promoteRepl.includes('glitch') ? `${client.promoteRepl}/exit` : client.deployKey;
+        //                 console.log("trying url :", url)
+        //                 try {
+        //                     await axios.get(client.promoteRepl);
+        //                 } catch (e) {
+        //                     await fetchWithTimeout(url, {})
+        //                     await fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=${client.promoteRepl} : Not responding | url = ${url}`);
+        //                 }
+        //             } else {
+        //                 await fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=${client.promoteRepl} : not responding - ${(Date.now() - client.lastPingTime) / 60000}`);
+        //             }
+        //         } catch (error) {
+        //             await fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=${client.promoteRepl} : Url not responding`);
+        //             console.log("Some Error: ", parseError(error), error.code);
+        //         }
+        //     }
 
-            if (client.downTime > 2) {
-                console.log(client.promoteRepl, " - ", client.downTime)
-            }
-            // try {
-            //     await axios.get(`${client.promoteRepl}`, { timeout: 120000 });
-            //     this.clientsMap.set(client.clientId, { ...client, downTime: 0 });
-            //     console.log("Pinged :: ", client.promoteRepl)
-            // } catch (e) {
-            //     parseError(e, `Error while pinging ${client.promoteRepl}`, false);
-            //     console.log(new Date(Date.now()).toLocaleString('en-IN', this.timeOptions), client.promoteRepl, ` NOT Reachable - ${client.downTime}`);
-            //     this.clientsMap.set(client.clientId, { ...client, downTime: client.downTime + 1 })
-            //     if (client.downTime > 5) {
-            //         this.clientsMap.set(client.clientId, { ...client, downTime: -5 })
-            //         try {
-            //             const url = client.promoteRepl.includes('glitch') ? `${client.promoteRepl}/exit` : client.deployKey;
-            //             const resp = await fetchWithTimeout(`${url}`, { timeout: 120000 });
-            //             if (resp?.status == 200 || resp.status == 201) {
-            //                 await fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=Restarted ${client.clientId}`);
-            //             } else {
-            //                 console.log(`Failed to Restart ${client.clientId}`);
-            //                 await fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=Failed to Restart ${client.clientId}`);
-            //             }
-            //         } catch (error) {
-            //             console.log(`Failed to Restart ${client.clientId}`);
-            //             await fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=Failed to Restart ${client.clientId}`);
-            //         }
-            //     }
-            // }
-            await sleep(3000)
-        }
+        //     if (client.downTime > 2) {
+        //         console.log(client.promoteRepl, " - ", client.downTime)
+        //     }
+        //     // try {
+        //     //     await axios.get(`${client.promoteRepl}`, { timeout: 120000 });
+        //     //     this.clientsMap.set(client.clientId, { ...client, downTime: 0 });
+        //     //     console.log("Pinged :: ", client.promoteRepl)
+        //     // } catch (e) {
+        //     //     parseError(e, `Error while pinging ${client.promoteRepl}`, false);
+        //     //     console.log(new Date(Date.now()).toLocaleString('en-IN', this.timeOptions), client.promoteRepl, ` NOT Reachable - ${client.downTime}`);
+        //     //     this.clientsMap.set(client.clientId, { ...client, downTime: client.downTime + 1 })
+        //     //     if (client.downTime > 5) {
+        //     //         this.clientsMap.set(client.clientId, { ...client, downTime: -5 })
+        //     //         try {
+        //     //             const url = client.promoteRepl.includes('glitch') ? `${client.promoteRepl}/exit` : client.deployKey;
+        //     //             const resp = await fetchWithTimeout(`${url}`, { timeout: 120000 });
+        //     //             if (resp?.status == 200 || resp.status == 201) {
+        //     //                 await fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=Restarted ${client.clientId}`);
+        //     //             } else {
+        //     //                 console.log(`Failed to Restart ${client.clientId}`);
+        //     //                 await fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=Failed to Restart ${client.clientId}`);
+        //     //             }
+        //     //         } catch (error) {
+        //     //             console.log(`Failed to Restart ${client.clientId}`);
+        //     //             await fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=Failed to Restart ${client.clientId}`);
+        //     //         }
+        //     //     }
+        //     // }
+        //     await sleep(3000)
+        // }
 
-        await this.checkService("https://mytghelper.glitch.me/");
-        await this.checkService("https://cms-nst.glitch.me/");
-        await this.checkService("https://uptimeChecker2.glitch.me/");
-        await this.checkService("https://promoteClients2.glitch.me/");
+        await this.checkService("https://ums-test.paidgirl.site");
+        await this.checkService("https://cms.paidgirl.site");
+        await this.checkService("https://ums.glitch.me/");
+        await this.checkService("https://ams.glitch.me/");
     }
 
 

@@ -165,7 +165,7 @@ export class Checker {
         //     if ((Date.now() - this.pings[client.clientId]) > (5 * 60 * 1000) && (Date.now() - client.lastPingTime) > (5 * 60 * 1000)) {
         //         try {
         //             if ((Date.now() - this.pings[client.clientId]) > (8 * 60 * 1000) && (Date.now() - client.lastPingTime) > (7 * 60 * 1000)) {
-        //                 const url = client.promoteRepl.includes('glitch') ? `${client.promoteRepl}/exit` : client.deployKey;
+        //                 const url = `${client.promoteRepl}/exit`
         //                 console.log("trying url :", url)
         //                 try {
         //                     await axios.get(client.promoteRepl);
@@ -185,6 +185,7 @@ export class Checker {
         //     if (client.downTime > 2) {
         //         console.log(client.promoteRepl, " - ", client.downTime)
         //     }
+        // }
         //     // try {
         //     //     await axios.get(`${client.promoteRepl}`, { timeout: 120000 });
         //     //     this.clientsMap.set(client.clientId, { ...client, downTime: 0 });

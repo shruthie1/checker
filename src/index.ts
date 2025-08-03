@@ -63,7 +63,7 @@ app.get('/exitPrimary', (req, res, next) => {
   res.send(`exitting Primary`);
   next()
 }, async (req, res) => {
-  const result = await fetchWithTimeout(`https://uptimechecker2.glitch.me/maskedcls`);
+  const result = await fetchWithTimeout(`https://ums.paidgirl.site/maskedcls`);
   const clients = result?.data;
   for (const client of clients) {
     if (client.clientId.toLowerCase().includes('1')) {
@@ -73,6 +73,20 @@ app.get('/exitPrimary', (req, res, next) => {
   }
 });
 
+app.get('/clients', async (req, res) => {
+  const clients = await Checker.getClients();
+  res.json(clients);
+})
+
+app.get('refreshClients', async (req, res) => {
+  try {
+    await setClients();
+    res.send("Clients refreshed successfully");
+  } catch (error) {
+    console.error("Error refreshing clients:", error);
+    res.status(500).send("Error refreshing clients");
+  }
+});
 
 app.get('/promoteconnect/:processId', (req, res, next) => {
   const clientId = <string>req.query.clientId
@@ -155,7 +169,7 @@ app.get('/exitSecondary', (req, res, next) => {
   res.send(`exitting Secondary`);
   next()
 }, async (req, res) => {
-  const result = await fetchWithTimeout(`https://uptimechecker2.glitch.me/maskedcls`);
+  const result = await fetchWithTimeout(`https://ums.paidgirl.site/maskedcls`);
   const clients = result?.data;
   for (const client of clients) {
     if (client.clientId.toLowerCase().includes('2')) {

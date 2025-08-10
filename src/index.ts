@@ -249,11 +249,10 @@ setClients()
 
 process.on('unhandledRejection', (reason, promise) => {
   console.log('Unhandled Rejection at Checker 2:', promise, 'reason:', reason);
-  // Application specific logging, throwing an error, or other logic here
   fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=Checker2: Unhandled Promise Rejection ${JSON.stringify(reason)}`);
 });
 
 process.on('uncaughtException', (error) => {
   console.error('Checker2:  Uncaught Exception At Checker 2:', error);
-  parseError(error, "Uncaught Exception Checker2:")
+  parseError(error, "Uncaught Exception Checker 2:")
 });

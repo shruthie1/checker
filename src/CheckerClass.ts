@@ -82,7 +82,7 @@ export class Checker {
                     return false;
                 }
             } catch (error) {
-                parseError(error, "Some Error here:")
+                parseError(error, "Failed to get process ID:");
             }
         } else {
             console.log(new Date(Date.now()).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }), `Client ${clientId} Not exist`);

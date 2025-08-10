@@ -223,7 +223,7 @@ export class Checker {
 
     async checkService(url: string, deployKey?: string) {
         try {
-            await axios.get(url, { timeout: 55000 });
+            await axios.get(url, { timeout: 55000 , headers: { 'User-Agent': 'CheckerClass' , 'x-api-key': process.env.X_API_KEY || 'santoor' } });
             console.log("Pinged :: ", url)
             await sleep(5000)
         } catch (e) {
@@ -231,7 +231,7 @@ export class Checker {
             await fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=${url}  NOT Reachable`);
             try {
                 if (deployKey) {
-                    const resp = await axios.get(`${deployKey ? deployKey : `${url}/exit`}`, { timeout: 55000 });
+                    const resp = await axios.get(`${deployKey ? deployKey : `${url}/exit`}`, { timeout: 55000 , headers: { 'User-Agent': 'CheckerClass' , 'x-api-key': process.env.X_API_KEY || 'santoor' } });
                     if (resp?.status == 200 || resp.status == 201) {
                         await fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=Restarted ${url}`);
                     }

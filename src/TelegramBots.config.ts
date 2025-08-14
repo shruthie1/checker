@@ -376,7 +376,7 @@ export class BotConfig {
         // Prepare request parameters
         const params = new URLSearchParams({
             chat_id: channelId,
-            text: `${process.env.clientId.toUpperCase()}-PROM: ${message}`,
+            text: `${process.env.clientId.toUpperCase() || "Checker 2"}: ${message}`,
         });
 
         if (options.parseMode) params.append('parse_mode', options.parseMode);

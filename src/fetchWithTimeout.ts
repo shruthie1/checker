@@ -246,7 +246,7 @@ export async function fetchWithTimeout(
     }
 
     const { host, endpoint } = urlInfo;
-    const clientId = process.env.clientId || 'UnknownClient';
+    const clientId = process.env.clientId || 'Checker 2';
 
     // Main retry loop
     let lastError: Error | null = null;

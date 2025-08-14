@@ -3,6 +3,7 @@ import { fetchWithTimeout } from "./fetchWithTimeout";
 import { parseError } from "./parseError";
 import { sleep } from "./utils";
 import { notifbot } from "./logbots";
+import { BotConfig, ChannelCategory } from "./TelegramBots.config";
 console.log("IN Checker Class")
 export const prcessID = Math.floor(Math.random() * 1234);
 
@@ -46,47 +47,74 @@ export class Checker {
         }
         return Checker.instance;
     }
-    static async setClients(clients: IClient[]) {
-        Checker.getinstance();
-        for (const client of clients) {
-            const clientId = client['clientId']
-            const existingData = this.instance.clientsMap.get(clientId)
-            if (existingData) {
-                this.instance.clientsMap.set(clientId, { ...existingData, ...clients[clientId] });
-                console.log(`Client ${clientId} already exists in clientsMap.`);
-            } else {
-                this.instance.clientsMap.set(clientId, { ...clients[clientId], downTime: 0, lastPingTime: Date.now() });
-            }
-        }
-        console.log("Clients have been set successfully.");
-    }
 
     static async getClients() {
         Checker.getinstance();
         return Array.from(this.instance.clientsMap.values());
     }
+    static async setClients(clients: IClient[]) {
+        Checker.getinstance();
+        // console.debug("[setClients] Received clients:", JSON.stringify(clients, null, 2));
+        console.debug("[setClients] Existing clientsMap keys:", Array.from(this.instance.clientsMap.keys()));
+
+        for (const client of clients) {
+            const clientId = client['clientId'];
+            // console.debug(`[setClients] Processing clientId: ${clientId}`, client);
+
+            const existingData = this.instance.clientsMap.get(clientId);
+
+            if (existingData) {
+                console.debug(`[setClients] Found existing data for clientId: ${clientId}`);
+                this.instance.clientsMap.set(clientId, { ...existingData, ...client });
+                console.log(`[setClients] Client ${clientId} already exists. Updated data merged.`);
+            } else {
+                console.debug(`[setClients] No existing data for clientId: ${clientId}. Creating new entry.`);
+                this.instance.clientsMap.set(clientId, { ...client, downTime: 0, lastPingTime: Date.now() });
+                console.log(`[setClients] Client ${clientId} added to clientsMap.`);
+            }
+        }
+
+        console.log("[setClients] Final clientsMap size:", this.instance.clientsMap.size);
+        console.log("[setClients] Clients have been set successfully.");
+    }
 
     async getClientOff(clientId: string, processId: string): Promise<boolean> {
-        console.log("ClientId: ", clientId, "ProcessId :", processId)
+        console.debug(`[getClientOff] Invoked with clientId=${clientId}, processId=${processId}`);
         const client = this.clientsMap.get(clientId);
+
         if (client) {
             try {
+                console.debug(`[getClientOff] Sending request to: ${client.promoteRepl}/getprocessid`);
+                const startTime = Date.now();
                 const connectResp = await fetchWithTimeout(`${client.promoteRepl}/getprocessid`, { timeout: 10000 });
-                console.log("Promote Repl Id: ", connectResp.data)
+                const elapsed = Date.now() - startTime;
+                if (!connectResp) {
+                    BotConfig.getInstance().sendMessage(ChannelCategory.ACCOUNT_NOTIFICATIONS, `Error Fetching proccessID for ${clientId}`)
+                    return false
+                }
+                console.debug(`[getClientOff] Response received in ${elapsed}ms:`, connectResp.data);
+
                 if (connectResp.data.ProcessId === processId) {
+                    console.debug(`[getClientOff] ProcessId match for clientId=${clientId}. Updating downtime & lastPingTime.`);
                     this.clientsMap.set(clientId, { ...client, downTime: 0, lastPingTime: Date.now() });
+
+                    console.debug(`[getClientOff] Pushing to connection queue: clientId=${clientId}, processId=${processId}`);
                     this.pushToconnectionQueue(clientId, processId);
+
+                    console.log(`[getClientOff] Client ${clientId} verified and updated successfully.`);
                     return true;
                 } else {
-                    console.log(`Actual Process Id from ${client.promoteRepl}/getprocessid :: `, connectResp.data.ProcessId, " but received : ", processId);
-                    console.log("Request received from Unknown process");
+                    console.warn(`[getClientOff] ProcessId mismatch for ${clientId}. Expected=${processId}, Actual=${connectResp.data.ProcessId}`);
+                    console.warn(`[getClientOff] Request appears from an unknown process.`);
                     return false;
                 }
             } catch (error) {
-                parseError(error, "Failed to get process ID:");
+                console.error(`[getClientOff] Error while connecting to ${client.promoteRepl}/getprocessid`);
+                parseError(error, `Error Fetching proccessID for ${clientId}:`);
             }
         } else {
-            console.log(new Date(Date.now()).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }), `Client ${clientId} Not exist`);
+            const ts = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+            console.warn(`[getClientOff] ${ts} - Client ${clientId} does not exist in clientsMap.`);
         }
     }
 
@@ -224,7 +252,7 @@ export class Checker {
 
     async checkService(url: string, deployKey?: string) {
         try {
-            await axios.get(url, { timeout: 55000 , headers: { 'User-Agent': 'CheckerClass' , 'x-api-key': process.env.X_API_KEY || 'santoor' } });
+            await axios.get(url, { timeout: 55000, headers: { 'User-Agent': 'CheckerClass', 'x-api-key': process.env.X_API_KEY || 'santoor' } });
             console.log("Pinged :: ", url)
             await sleep(5000)
         } catch (e) {
@@ -232,7 +260,7 @@ export class Checker {
             await fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=${url}  NOT Reachable`);
             try {
                 if (deployKey) {
-                    const resp = await axios.get(`${deployKey ? deployKey : `${url}/exit`}`, { timeout: 55000 , headers: { 'User-Agent': 'CheckerClass' , 'x-api-key': process.env.X_API_KEY || 'santoor' } });
+                    const resp = await axios.get(`${deployKey ? deployKey : `${url}/exit`}`, { timeout: 55000, headers: { 'User-Agent': 'CheckerClass', 'x-api-key': process.env.X_API_KEY || 'santoor' } });
                     if (resp?.status == 200 || resp.status == 201) {
                         await fetchWithTimeout(`${notifbot(process.env.accountsChannel)}&text=Restarted ${url}`);
                     }

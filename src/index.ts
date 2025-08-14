@@ -10,8 +10,8 @@ import { parseError } from './parseError';
 const app = express();
 const port = process.env.PORT || 3000;
 async function setEnv() {
-  // await getDataAndSetEnvVariables(`https://mytghelper.glitch.me/configuration`);
-  await getDataAndSetEnvVariables(`https://api.npoint.io/cc57d60feea67e47b6c4`);
+  await getDataAndSetEnvVariables(`https://ums.paidgirl.site/configuration`);
+  // await getDataAndSetEnvVariables(`https://api.npoint.io/cc57d60feea67e47b6c4`);
 }
 let canExit = Date.now();
 setEnv().then(() => {
@@ -217,7 +217,7 @@ async function sendToAll(endpoint: string) {
 
 export async function getDataAndSetEnvVariables(url: string) {
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, { headers: { 'x-api-key': process.env.X_API_KEY || 'santoor' } });
     const jsonData: any = await response.json();
     for (const key in jsonData) {
       console.log("Setting Key", key)

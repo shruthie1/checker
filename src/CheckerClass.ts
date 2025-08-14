@@ -46,9 +46,10 @@ export class Checker {
         }
         return Checker.instance;
     }
-    static async setClients(clients: object) {
+    static async setClients(clients: IClient[]) {
         Checker.getinstance();
-        for (const clientId in clients) {
+        for (const client of clients) {
+            const clientId = client['clientId']
             const existingData = this.instance.clientsMap.get(clientId)
             if (existingData) {
                 this.instance.clientsMap.set(clientId, { ...existingData, ...clients[clientId] });

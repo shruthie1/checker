@@ -231,7 +231,7 @@ export async function getDataAndSetEnvVariables(url: string) {
 
 Checker.getinstance();
 async function setClients() {
-  const result = await fetchWithTimeout(`https://api.npoint.io/f0d1e44d82893490bbde`);
+  const result = await fetchWithTimeout(`https://ums.paidgirl.site/maskedcls`);
   await Checker.setClients(result.data)
 }
 setInterval(async () => {

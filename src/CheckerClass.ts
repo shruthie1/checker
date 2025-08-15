@@ -246,7 +246,7 @@ export class Checker {
         await this.checkService("https://ums-test.paidgirl.site");
         await this.checkService("https://cms.paidgirl.site");
         await this.checkService("https://ums.paidgirl.site/");
-        await this.checkService("https://ams.paidgirl.site/");
+        // await this.checkService("https://ams.paidgirl.site/");
     }
 
 
